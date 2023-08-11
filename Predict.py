@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 print(f'->End Imports ({time.time() - tic} seconds)')
 
 # CONSTANTS
-PREDICTION_IMAGE = os.path.join('C:\\Users', 'kylev', 'Desktop', 'Education', 'INFO_523', 'Project', 'INFO_523_Project', 'predict', 'temp.PNG')
+PREDICTION_IMAGE = os.path.join('C:\\Users', 'kylev', 'Desktop', 'Education', 'INFO_523', 'Project', 'INFO_523_Project', 'predict', 'SizeShapeColor.PNG')
 #PREDICTION_IMAGE = os.path.join('C:\\Users', 'kylev', 'Desktop', 'Education', 'INFO_523', 'Project', 'INFO_523_Project', 'train', 'train.PNG')
 MODEL_PATH = os.path.join('C:\\Users', 'kylev', 'Desktop', 'Education', 'INFO_523', 'Project', 'INFO_523_Project', 'train', 'model.csv')
 
@@ -48,17 +48,19 @@ print(f'->End Clustering Letter Pixels ({time.time() - tic} seconds)')
 # Perform prediction
 for ii, l in enumerate(set(labels)):
     err = np.zeros(len(model))
+    likelyhood = np.zeros(len(model))
     X_l = X[labels == l, :]
     q = letter_pixels(X_l)
     centers = q.get_encoded_centers()
     for jj, category in enumerate(model):
         err[jj] = np.linalg.norm(model[category] - centers)
+    likelyhood = 100 * (1 - err / np.max(err))
+    likelyhood_ordered = np.round(likelyhood[np.argsort(err)], 2)
     letters_ordered_by_probability = np.array([key for key in model.keys()])[np.argsort(err)]
-    print(f'Prediction: "{letters_ordered_by_probability[0]}"')
+    print('=== Top 5 Predictions ===')
+    for ii in range(5):
+        print(f'Prediction: "{letters_ordered_by_probability[ii]}" Probability: {likelyhood_ordered[ii]}%')
     
     plot_array = np.zeros(np.shape(img_array))
     plot_array[X_l[:, 0], X_l[:, 1]] = 1
     show_image(plot_array)
-    
-    #import pdb; pdb.set_trace()
-
