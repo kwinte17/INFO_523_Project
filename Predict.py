@@ -11,7 +11,8 @@ import matplotlib.pyplot as plt
 print(f'->End Imports ({time.time() - tic} seconds)')
 
 # CONSTANTS
-PREDICTION_IMAGE = os.path.join('C:\\Users', 'kylev', 'Desktop', 'Education', 'INFO_523', 'Project', 'INFO_523_Project', 'predict', 'SizeShapeColor.PNG')
+#PREDICTION_IMAGE = os.path.join('C:\\Users', 'kylev', 'Desktop', 'Education', 'INFO_523', 'Project', 'INFO_523_Project', 'predict', 'SizeShapeColor.PNG')
+PREDICTION_IMAGE = os.path.join('C:\\Users', 'kylev', 'Desktop', 'Education', 'INFO_523', 'Project', 'INFO_523_Project', 'predict', 'RockwellAlphabet.PNG')
 #PREDICTION_IMAGE = os.path.join('C:\\Users', 'kylev', 'Desktop', 'Education', 'INFO_523', 'Project', 'INFO_523_Project', 'train', 'train.PNG')
 MODEL_PATH = os.path.join('C:\\Users', 'kylev', 'Desktop', 'Education', 'INFO_523', 'Project', 'INFO_523_Project', 'train', 'model.csv')
 
