@@ -12,6 +12,8 @@ print(f'->End Imports ({time.time() - tic} seconds)')
 
 # CONSTANTS
 LEARNING_IMG_PATH = os.path.join('C:\\Users', 'kylev', 'Desktop', 'Education', 'INFO_523', 'Project', 'INFO_523_Project', 'train', 'train.PNG')
+LABELS_PATH = os.path.join('C:\\Users', 'kylev', 'Desktop', 'Education', 'INFO_523', 'Project', 'INFO_523_Project', 'train', 'labels.csv')
+TRAINED_MODEL_PATH = os.path.join('C:\\Users', 'kylev', 'Desktop', 'Education', 'INFO_523', 'Project', 'INFO_523_Project', 'train', 'model.csv')
 
 # helper functions
 def show_image(img):
@@ -130,12 +132,21 @@ print(f'->End Clustering Letter Pixels ({time.time() - tic} seconds)')
 #    plot_array[X_l[:, 0], X_l[:, 1]] = 1
 #    show_image(plot_array)
 
+# Check that the number of clusters matches the number of letters we are training to
+with open(LABELS_PATH, 'r') as f:
+    lbls = f.readline().strip().split(',')
+assert len(lbls) == len(label_set_ordered), 'ERROR: Number of clusters in the training set does not match the number of providied labels'
+
 # Calculate quad centers for each letter
-for l in label_set_ordered:
+trained_model = []
+for ii, l in enumerate(label_set_ordered):
     X_l = X[labels == l, :]
     q = letter_pixels(X_l)
-    c = q.get_encoded_centers()
-    #print(c)
+    centers = q.get_encoded_centers()
+    # Round to 3 decimal places
+    trained_model.append([lbls[ii]] + [round(thing * 1000) / 1000 for thing in centers])
 
+with open(TRAINED_MODEL_PATH, 'w') as f:
+    for dataline in trained_model:
+        f.write(','.join(str(thing) for thing in dataline) + '\n')
 
-import pdb; pdb.set_trace()
