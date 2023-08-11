@@ -1,10 +1,14 @@
 
 # Imports
+import time
+print('->Begin Imports')
+tic = time.time()
 from sklearn.cluster import DBSCAN
 from PIL import Image, ImageOps
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+print(f'->End Imports ({time.time() - tic} seconds)')
 
 # CONSTANTS
 LEARNING_IMG_PATH = os.path.join('C:\\Users', 'kylev', 'Desktop', 'Education', 'INFO_523', 'Project', 'INFO_523_Project', 'train', 'train.PNG')
@@ -20,11 +24,72 @@ def show_cluster(X, row_bool):
     plot_array[X_l[:, 0], X_l[:, 1]] = 1
     show_image(plot_array)
 
+class letter_pixels():
+    def __init__(self, pixels):
+        self._X = pixels
 
+        # Create bounding box
+        self._top_left = np.array([0, 0])
+        self._bot_right = np.array([0, 0])
+        self._bot_right[0] = np.max(self._X[:, 0])
+        self._top_left[0] = np.min(self._X[:, 0])
+        self._bot_right[1] = np.max(self._X[:, 1])
+        self._top_left[1] = np.min(self._X[:, 1])
+        self._center = (self._top_left + self._bot_right) / 2
+
+        # Separate into quad clusters
+        # -----------
+        # | q2 | q1 |
+        # -----------
+        # | q3 | q4 |
+        # -----------
+        q1 = self._X[(self._X[:, 0] < self._center[0]) & ( self._X[:, 1] >= self._center[1]), :]
+        q2 = self._X[(self._X[:, 0] < self._center[0]) & ( self._X[:, 1] < self._center[1]), :]
+        q3 = self._X[(self._X[:, 0] >= self._center[0]) & ( self._X[:, 1] < self._center[1]), :]
+        q4 = self._X[(self._X[:, 0] >= self._center[0]) & ( self._X[:, 1] >= self._center[1]), :]
+
+        ## Create a plot with the quads in different colors
+        #plot_array = np.zeros(np.shape(img_array)) + 255
+        #plot_array[q1[:, 0], q1[:, 1]] = 0
+        #plot_array[q2[:, 0], q2[:, 1]] = 50
+        #plot_array[q3[:, 0], q3[:, 1]] = 100
+        #plot_array[q4[:, 0], q4[:, 1]] = 150
+        #show_image(plot_array)
+
+        # Calculate quad cluster means
+#        if len(q1) == 0 or len(q2) == 0 or len(q3) == 0 or len(q4) == 0:
+#            import pdb; pdb.set_trace()
+        if len(q1) > 0:
+            self._q1_mean = np.array([np.mean(q1[:, 0]), np.mean(q1[:, 1])]) - np.array([self._top_left[0], self._center[1]])
+        else:
+            self._q1_mean = np.array([0, 0])
+        if len(q2) > 0:
+            self._q2_mean = np.array([np.mean(q2[:, 0]), np.mean(q2[:, 1])]) - self._top_left
+        else:
+            self._q2_mean = np.array([0, 0])
+        if len(q3) > 0:
+            self._q3_mean = np.array([np.mean(q3[:, 0]), np.mean(q3[:, 1])]) - np.array([self._center[0], self._top_left[1]])
+        else:
+            self._q3_mean = np.array([0, 0])
+        if len(q4) > 0:
+            self._q4_mean = np.array([np.mean(q4[:, 0]), np.mean(q4[:, 1])]) - self._center
+        else:
+            self._q4_mean = np.array([0, 0])
+
+    def get_encoded_centers(self):
+        '''Return centers as a list'''
+        return np.reshape(np.array([self._q1_mean, self._q2_mean, self._q3_mean, self._q4_mean]), -1)
+
+
+print('->Begin Loading Image')
+tic = time.time()
 # Load img into grayscale pixel map
 im = ImageOps.grayscale(Image.open(LEARNING_IMG_PATH))
 img_array = np.asarray(im)
+print(f'->End Loading Image ({time.time() - tic} seconds)')
 
+print('->Begin Clustering Letter Pixels')
+tic = time.time()
 # Create a boolean map
 bool_array = np.zeros(np.shape(img_array))
 bool_array[img_array < np.max(img_array)] = 1
@@ -49,6 +114,7 @@ for l in set(labels):
     ii += 1
 
 label_set_ordered = np.asarray(list(set(labels)))[np.argsort(np.array(weights))]
+print(f'->End Clustering Letter Pixels ({time.time() - tic} seconds)')
 
 ## Shows letters using the label as color
 #plot_array = np.zeros(np.shape(img_array))
@@ -63,5 +129,13 @@ label_set_ordered = np.asarray(list(set(labels)))[np.argsort(np.array(weights))]
 #    plot_array = np.zeros(np.shape(img_array))
 #    plot_array[X_l[:, 0], X_l[:, 1]] = 1
 #    show_image(plot_array)
+
+# Calculate quad centers for each letter
+for l in label_set_ordered:
+    X_l = X[labels == l, :]
+    q = letter_pixels(X_l)
+    c = q.get_encoded_centers()
+    #print(c)
+
 
 import pdb; pdb.set_trace()
