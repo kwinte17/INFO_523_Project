@@ -14,6 +14,13 @@ def show_image(img):
     plt.imshow(img)
     plt.show()
 
+def show_cluster(X, row_bool):
+    X_l = X[row_bool, :]
+    plot_array = np.zeros(np.shape(img_array))
+    plot_array[X_l[:, 0], X_l[:, 1]] = 1
+    show_image(plot_array)
+
+
 # Load img into grayscale pixel map
 im = ImageOps.grayscale(Image.open(LEARNING_IMG_PATH))
 img_array = np.asarray(im)
@@ -31,6 +38,18 @@ labels = db.labels_
 n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
 print('Number of clusters found = ', n_clusters_)
 
+# Order labels
+weights = np.zeros(len(set(labels)))
+ii = 0
+for l in set(labels):
+    X_l = X[labels == l, :]
+    min_horiz = np.min(X_l[:, 1])
+    min_vert = np.min(X_l[:, 0])
+    weights[ii] = (round(min_vert / 10) * 10) * 100000 + min_horiz
+    ii += 1
+
+label_set_ordered = np.asarray(list(set(labels)))[np.argsort(np.array(weights))]
+
 ## Shows letters using the label as color
 #plot_array = np.zeros(np.shape(img_array))
 #for l in set(labels):
@@ -39,7 +58,7 @@ print('Number of clusters found = ', n_clusters_)
 #show_image(plot_array)
 
 ## SHOWS EACH LETTER ONE AT A TIME
-#for l in set(labels):
+#for l in label_set_ordered:
 #    X_l = X[labels == l, :]
 #    plot_array = np.zeros(np.shape(img_array))
 #    plot_array[X_l[:, 0], X_l[:, 1]] = 1
