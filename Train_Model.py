@@ -12,15 +12,12 @@ from common.types import *
 print(f'->End Imports ({time.time() - tic} seconds)')
 
 # CONSTANTS
-LEARNING_IMG_PATH = os.path.join('C:\\Users', 'kylev', 'Desktop', 'Education', 'INFO_523', 'Project', 'INFO_523_Project', 'train', 'train.PNG')
+#LEARNING_IMG_PATH = os.path.join('C:\\Users', 'kylev', 'Desktop', 'Education', 'INFO_523', 'Project', 'INFO_523_Project', 'train', 'train.PNG')
+LEARNING_IMG_PATH = os.path.join('C:\\Users', 'kylev', 'Desktop', 'Education', 'INFO_523', 'Project', 'INFO_523_Project', 'train', 'trainLARGE.PNG')
 LABELS_PATH = os.path.join('C:\\Users', 'kylev', 'Desktop', 'Education', 'INFO_523', 'Project', 'INFO_523_Project', 'train', 'labels.csv')
 TRAINED_MODEL_PATH = os.path.join('C:\\Users', 'kylev', 'Desktop', 'Education', 'INFO_523', 'Project', 'INFO_523_Project', 'train', 'model.csv')
 
 # helper functions
-def show_image(img):
-    plt.imshow(img)
-    plt.show()
-
 def show_cluster(X, row_bool):
     X_l = X[row_bool, :]
     plot_array = np.zeros(np.shape(img_array))
@@ -95,10 +92,10 @@ print('->Begin Clustering Letter Pixels')
 tic = time.time()
 # Create a boolean map
 bool_array = np.zeros(np.shape(img_array))
-bool_array[img_array < np.max(img_array)] = 1
+bool_array[img_array < (np.min(img_array) + 150)] = 1
 
 # Assemble True pixels into single variable
-X = np.transpose(np.asarray(img_array < np.max(img_array)).nonzero())
+X = np.transpose(np.asarray(bool_array).nonzero())
 
 # Cluster using DBSCAN
 db = DBSCAN(eps=4, min_samples=3).fit(X)
